@@ -72,7 +72,7 @@ fun TvMovieCard(
             .allowRgb565(true)
             .crossfade(false)
             .apply {
-                imageReferer?.takeIf { it.isNotBlank() }?.let { header("Referer", it) }
+                imageReferer?.takeIf { it.isNotBlank() }?.let { setHeader("Referer", it) }
             }
             .build()
     }
