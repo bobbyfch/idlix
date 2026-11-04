@@ -1,6 +1,7 @@
 package com.idlix.tv.ui.screens.browse
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.Border
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Text
 import com.idlix.tv.data.model.MovieItem
@@ -305,12 +307,18 @@ fun CatalogBrowseScreen(
                             .then(if (choice.value == catalogSections.first().value) {
                                 Modifier.focusRequester(exploreFocusRequester)
                             } else Modifier),
-                        shape = CardDefaults.shape(shape = RoundedCornerShape(22.dp)),
+                        shape = CardDefaults.shape(shape = RoundedCornerShape(20.dp)),
                         colors = CardDefaults.colors(
                             containerColor = NetflixDarkCard,
                             focusedContainerColor = NetflixDarkGray
                         ),
-                        scale = CardDefaults.scale(focusedScale = 1.045f)
+                        scale = CardDefaults.scale(focusedScale = 1.05f),
+                        border = CardDefaults.border(
+                            border = Border.None,
+                            focusedBorder = Border(
+                                border = BorderStroke(2.dp, NetflixRed)
+                            )
+                        )
                     ) {
                         Box(
                             Modifier.fillMaxSize().padding(24.dp),

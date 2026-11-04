@@ -8,12 +8,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.idlix.tv.data.model.WatchHistoryItem
-import com.idlix.tv.ui.theme.NetflixWhite
 
 @Composable
 fun TvContinueWatchingRow(
@@ -31,9 +29,8 @@ fun TvContinueWatchingRow(
     ) {
         Text(
             text = title,
-            color = NetflixWhite,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 24.dp, bottom = 8.dp)
         )
 

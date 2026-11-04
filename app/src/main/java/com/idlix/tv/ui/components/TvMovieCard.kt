@@ -3,7 +3,6 @@ package com.idlix.tv.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,17 +33,15 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Glow
 import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
-import com.idlix.tv.ui.theme.NetflixDarkCard
 import com.idlix.tv.ui.theme.NetflixGold
-import com.idlix.tv.ui.theme.NetflixLightGray
-import com.idlix.tv.ui.theme.NetflixRed
 import com.idlix.tv.ui.theme.NetflixWhite
 
-private val CardShape = RoundedCornerShape(17.dp)
+private val CardShape = RoundedCornerShape(20.dp)
 private val BottomScrimBrush = Brush.verticalGradient(
     colors = listOf(Color.Transparent, Color(0xEC000000))
 )
@@ -87,19 +84,21 @@ fun TvMovieCard(
                     onFocus?.invoke()
                 }
             },
-        scale = CardDefaults.scale(focusedScale = 1.065f),
+        scale = CardDefaults.scale(focusedScale = 1.05f),
         glow = CardDefaults.glow(focusedGlow = Glow.None),
         shape = CardDefaults.shape(shape = CardShape),
         // TV focus is communicated by the subtle native scale, not a white poster frame.
         border = CardDefaults.border(
             border = Border.None,
-            focusedBorder = Border.None
+            focusedBorder = Border(
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+            )
         )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NetflixDarkCard)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             AsyncImage(
                 model = imageRequest,

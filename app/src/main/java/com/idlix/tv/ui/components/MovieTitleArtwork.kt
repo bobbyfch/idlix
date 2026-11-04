@@ -41,7 +41,8 @@ fun MovieTitleArtwork(
     textSize: TextUnit = 30.sp,
     alignment: Alignment = Alignment.CenterStart,
     textAlign: TextAlign = TextAlign.Start,
-    breathing: Boolean = false
+    breathing: Boolean = false,
+    textColor: Color = Color.White
 ) {
     val context = LocalContext.current
     var logoLoaded by remember(logoUrl) { mutableStateOf(false) }
@@ -78,7 +79,7 @@ fun MovieTitleArtwork(
         if (!logoLoaded || logoFailed) {
             Text(
                 text = title.ifBlank { "IDLIX" },
-                color = Color.White,
+                color = textColor,
                 fontSize = textSize,
                 fontWeight = FontWeight.Black,
                 lineHeight = textSize * 1.12f,

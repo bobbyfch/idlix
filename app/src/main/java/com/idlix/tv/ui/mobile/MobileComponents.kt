@@ -27,6 +27,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
@@ -81,15 +82,15 @@ internal fun MobileFilterChip(
                 fontSize = 12.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
-                color = if (selected) Color.White else NetflixWhite
+                color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             )
         },
         shape = RoundedCornerShape(13.dp),
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = NetflixDarkGray,
-            labelColor = NetflixWhite,
-            selectedContainerColor = NetflixRed,
-            selectedLabelColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            labelColor = MaterialTheme.colorScheme.onSurface,
+            selectedContainerColor = MaterialTheme.colorScheme.primary,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
         )
     )
 }
@@ -124,7 +125,7 @@ internal fun MobilePosterCard(
     Card(
         modifier = if (fullWidth) modifier.fillMaxWidth() else modifier.width(146.dp),
         onClick = onClick,
-        shape = RoundedCornerShape(15.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = SurfaceCard,
             contentColor = NetflixWhite
@@ -209,8 +210,8 @@ internal fun MobilePosterCard(
                 text = title,
                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 10.dp),
                 color = NetflixWhite,
-                fontSize = 13.sp,
-                lineHeight = 18.sp,
+                fontSize = 14.sp,
+                lineHeight = 19.sp,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 2,
                 minLines = 2,

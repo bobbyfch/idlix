@@ -24,7 +24,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.PlayCircle
-import androidx.compose.material.icons.filled.CollectionsBookmark
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.runtime.Composable
@@ -50,13 +49,10 @@ import androidx.compose.animation.animateColorAsState
 import androidx.tv.material3.Icon
 import androidx.tv.material3.Card
 import androidx.tv.material3.CardDefaults
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Border
 import androidx.tv.material3.Text
 import com.idlix.tv.R
-import com.idlix.tv.ui.theme.NetflixBlack
-import com.idlix.tv.ui.theme.NetflixLightGray
-import com.idlix.tv.ui.theme.NetflixWhite
-import com.idlix.tv.ui.theme.NetflixRed
 
 enum class NavItem(val labelRes: Int, val icon: ImageVector) {
     HOME(R.string.home, Icons.Default.Home),
@@ -96,7 +92,7 @@ fun TvNavDrawer(
         if (!visible) isExpanded = false
     }
 
-    Box(modifier = modifier.fillMaxSize().background(NetflixBlack)) {
+    Box(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // 1. Content stays put while the rail expands as an overlay.
         Box(
             modifier = Modifier
@@ -121,7 +117,7 @@ fun TvNavDrawer(
             modifier = Modifier
                 .fillMaxHeight()
                 .width(drawerWidth)
-                .background(com.idlix.tv.ui.theme.NetflixDarkCard.copy(alpha = 0.96f))
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.97f))
                 .padding(vertical = 19.dp, horizontal = 10.dp)
                 .onFocusChanged { isExpanded = it.hasFocus },
             verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -160,9 +156,10 @@ fun TvNavDrawer(
 
                 val itemTint by animateColorAsState(
                     targetValue = when {
-                        itemFocused -> NetflixWhite
-                        isSelected -> NetflixRed
-                        else -> NetflixLightGray
+                        itemFocused && isSelected -> MaterialTheme.colorScheme.onPrimary
+                        itemFocused -> MaterialTheme.colorScheme.onSurface
+                        isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
                     },
                     label = "navigationItemTint"
                 )
@@ -180,10 +177,10 @@ fun TvNavDrawer(
                             itemFocused = it.isFocused
                             if (it.isFocused) isExpanded = true
                         },
-                    shape = CardDefaults.shape(shape = RoundedCornerShape(0.dp)),
+                    shape = CardDefaults.shape(shape = RoundedCornerShape(14.dp)),
                     colors = CardDefaults.colors(
-                        containerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
+                        containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                        focusedContainerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                     ),
                     scale = CardDefaults.scale(focusedScale = 1.0f),
                     border = CardDefaults.border(border = Border.None, focusedBorder = Border.None)
@@ -196,8 +193,8 @@ fun TvNavDrawer(
                                 .width(3.dp)
                                 .height(if (itemFocused) 26.dp else 22.dp)
                                 .background(
-                                    if (itemFocused && !isSelected) NetflixWhite.copy(alpha = 0.76f)
-                                    else NetflixRed,
+                                    if (itemFocused) MaterialTheme.colorScheme.onPrimary
+                                    else MaterialTheme.colorScheme.primary,
                                     RoundedCornerShape(2.dp)
                                 )
                         )

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -27,6 +26,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tv
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -45,9 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.idlix.tv.R
 import com.idlix.tv.ui.navigation.Screen
-import com.idlix.tv.ui.theme.NetflixLightGray
-import com.idlix.tv.ui.theme.NetflixRed
-import com.idlix.tv.ui.theme.NetflixWhite
 import dev.chrisbanes.haze.HazeState
 
 private data class ChromeTab(val route: String, val label: String, val icon: ImageVector)
@@ -94,14 +91,14 @@ internal fun MobileFloatingChrome(
                     Icon(
                         Icons.Default.History,
                         contentDescription = "Lanjutkan Menonton",
-                        tint = if (currentRoute == Screen.ContinueWatching.route) NetflixRed else NetflixWhite
+                        tint = if (currentRoute == Screen.ContinueWatching.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                     )
                 }
                 IconButton(onClick = { navigateTo(Screen.Settings.route) }) {
                     Icon(
                         Icons.Default.Settings,
                         contentDescription = "Pengaturan",
-                        tint = if (currentRoute == Screen.Settings.route) NetflixRed else NetflixWhite
+                        tint = if (currentRoute == Screen.Settings.route) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -127,11 +124,11 @@ internal fun MobileFloatingChrome(
                             label = { Text(tab.label, maxLines = 1) },
                             alwaysShowLabel = true,
                             colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = NetflixRed,
-                                selectedTextColor = NetflixWhite,
-                                indicatorColor = NetflixRed.copy(alpha = 0.20f),
-                                unselectedIconColor = NetflixLightGray,
-                                unselectedTextColor = NetflixLightGray
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = Color.Transparent,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }
@@ -160,11 +157,11 @@ internal fun MobileFloatingChrome(
                             label = { Text(tab.label, maxLines = 1) },
                             alwaysShowLabel = true,
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = NetflixRed,
-                                selectedTextColor = NetflixWhite,
-                                indicatorColor = NetflixRed.copy(alpha = 0.18f),
-                                unselectedIconColor = NetflixLightGray,
-                                unselectedTextColor = NetflixLightGray
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                indicatorColor = Color.Transparent,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,18 +38,15 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Glow
 import androidx.tv.material3.Icon
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Precision
 import com.idlix.tv.data.model.WatchHistoryItem
 import com.idlix.tv.ui.theme.NetflixBlack
-import com.idlix.tv.ui.theme.NetflixDarkCard
-import com.idlix.tv.ui.theme.NetflixLightGray
-import com.idlix.tv.ui.theme.NetflixRed
-import com.idlix.tv.ui.theme.NetflixWhite
 
-private val ContinueCardShape = RoundedCornerShape(8.dp)
+private val ContinueCardShape = RoundedCornerShape(16.dp)
 private val ContinueScrimBrush = Brush.verticalGradient(
     colors = listOf(Color.Transparent, Color(0xCC141414), NetflixBlack)
 )
@@ -84,15 +80,20 @@ fun TvContinueWatchingCard(
             .width(width.dp)
             .height(height.dp)
             .onFocusChanged { isFocused = it.isFocused },
-        scale = CardDefaults.scale(focusedScale = 1.045f),
+        scale = CardDefaults.scale(focusedScale = 1.05f),
         glow = CardDefaults.glow(focusedGlow = Glow.None),
         shape = CardDefaults.shape(shape = ContinueCardShape),
-        border = CardDefaults.border(border = Border.None, focusedBorder = Border.None)
+        border = CardDefaults.border(
+            border = Border.None,
+            focusedBorder = Border(
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+            )
+        )
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(NetflixDarkCard)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             // Backdrop Image
             AsyncImage(
@@ -114,13 +115,13 @@ fun TvContinueWatchingCard(
                 Box(
                     modifier = Modifier
                         .size(36.dp)
-                        .background(NetflixRed, CircleShape)
+                        .background(MaterialTheme.colorScheme.primary, CircleShape)
                         .align(Alignment.Center)
                 ) {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Play",
-                        tint = NetflixWhite,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier
                             .size(22.dp)
                             .align(Alignment.Center)
@@ -138,7 +139,7 @@ fun TvContinueWatchingCard(
                 Text(
                     text = item.title,
                     color = NetflixWhite,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -153,8 +154,8 @@ fun TvContinueWatchingCard(
                 if (subtitle.isNotBlank()) {
                     Text(
                         text = subtitle,
-                        color = NetflixLightGray,
-                        fontSize = 10.sp,
+                        color = Color.White.copy(alpha = 0.88f),
+                        fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -166,14 +167,14 @@ fun TvContinueWatchingCard(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(3.dp)
+                        .height(4.dp)
                         .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(1.5.dp))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(fraction = item.progressFraction.coerceIn(0f, 1f))
                             .fillMaxHeight()
-                            .background(NetflixRed, RoundedCornerShape(1.5.dp))
+                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(2.dp))
                     )
                 }
             }

@@ -1,6 +1,7 @@
 package com.idlix.tv.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,11 +31,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
+import androidx.tv.material3.Border
+import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.Text
@@ -46,11 +48,7 @@ import com.idlix.tv.data.model.MovieItem
 import com.idlix.tv.data.repository.IdlixRepository
 import com.idlix.tv.data.repository.TitleLogoRepository
 import kotlinx.coroutines.CancellationException
-import com.idlix.tv.ui.theme.NetflixBlack
 import com.idlix.tv.ui.theme.NetflixGold
-import com.idlix.tv.ui.theme.NetflixLightGray
-import com.idlix.tv.ui.theme.NetflixRed
-import com.idlix.tv.ui.theme.NetflixWhite
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -65,13 +63,17 @@ fun TvHeroBillboard(
     if (movie == null) return
     // The photo stays cinematic while its lower edge blends into the selected
     // page theme. Use dark scrim on the text region for reliable contrast.
+    val heroSurface = MaterialTheme.colorScheme.background
     val heroBottomBrush = Brush.verticalGradient(
-        colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.35f), NetflixBlack),
+        colors = listOf(Color.Transparent, heroSurface.copy(alpha = 0.38f), heroSurface),
         startY = 80f
     )
     val heroLeftBrush = Brush.horizontalGradient(
-        colors = listOf(Color.Black.copy(alpha = 0.94f),
-            Color.Black.copy(alpha = 0.54f), Color.Transparent)
+        colors = listOf(
+            heroSurface.copy(alpha = 0.96f),
+            heroSurface.copy(alpha = 0.72f),
+            Color.Transparent
+        )
     )
 
     val context = LocalContext.current
@@ -144,7 +146,8 @@ fun TvHeroBillboard(
                 title = movie.title,
                 logoUrl = titleLogo.value,
                 modifier = Modifier.fillMaxWidth().height(80.dp),
-                textSize = 28.sp
+                textSize = 28.sp,
+                textColor = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -165,7 +168,7 @@ fun TvHeroBillboard(
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = "${movie.formattedRating} / 10",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -175,7 +178,7 @@ fun TvHeroBillboard(
                 movie.releaseDate?.take(4)?.let { year ->
                     Text(
                         text = year,
-                        color = Color(0xFFE1E4EC),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp
                     )
                 }
@@ -183,12 +186,12 @@ fun TvHeroBillboard(
                 movie.quality?.let { q ->
                     Box(
                         modifier = Modifier
-                            .background(Color(0x44FFFFFF), RoundedCornerShape(3.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.84f), RoundedCornerShape(6.dp))
                             .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = q,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -206,12 +209,17 @@ fun TvHeroBillboard(
                     onClick = onPlayClick,
                     modifier = playButtonModifier,
                     colors = ButtonDefaults.colors(
-                        containerColor = Color.White,
-                        contentColor = Color(0xFF171923),
-                        focusedContainerColor = NetflixRed,
-                        focusedContentColor = Color.White
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ),
-                    shape = ButtonDefaults.shape(shape = RoundedCornerShape(14.dp))
+                    border = ButtonDefaults.border(
+                        focusedBorder = Border(
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                        )
+                    ),
+                    shape = ButtonDefaults.shape(shape = RoundedCornerShape(16.dp))
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -233,12 +241,17 @@ fun TvHeroBillboard(
                 Button(
                     onClick = onDetailsClick,
                     colors = ButtonDefaults.colors(
-                        containerColor = Color(0x44FFFFFF),
-                        contentColor = Color.White,
-                        focusedContainerColor = Color.White,
-                        focusedContentColor = Color(0xFF171923)
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.84f),
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ),
-                    shape = ButtonDefaults.shape(shape = RoundedCornerShape(14.dp))
+                    border = ButtonDefaults.border(
+                        focusedBorder = Border(
+                            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                        )
+                    ),
+                    shape = ButtonDefaults.shape(shape = RoundedCornerShape(16.dp))
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
