@@ -128,8 +128,8 @@ jobs:
           test -x "$AAPT"
           OUTPUT="$("$APKSIGNER" verify --verbose --print-certs "$APK")"
           grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' <<< "$OUTPUT"
-          SIGNER="$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<< "$OUTPUT" | head -n1 | tr '[:lower:]' '[:upper:]')"
-          EXPECTED="${EXPECTED_SIGNER_SHA256^^}"
+          SIGNER="$(sed -n 's/^[[:space:]]*Signer #1 certificate SHA-256 digest:[[:space:]]*//p' <<< "$OUTPUT" | head -n1 | tr -d '[:space:]:' | tr '[:lower:]' '[:upper:]')"
+          EXPECTED="$(tr -d '[:space:]:' <<< "$EXPECTED_SIGNER_SHA256" | tr '[:lower:]' '[:upper:]')"
           if [[ ! "$EXPECTED" =~ ^[0-9A-F]{64}$ || "$SIGNER" != "$EXPECTED" ]]; then
             echo "::error::APK certificate does not match IDLIX_SIGNING_BUNDLE"
             exit 1
