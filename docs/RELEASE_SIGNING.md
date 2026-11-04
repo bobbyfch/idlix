@@ -6,11 +6,12 @@ Rilis pertama di repo baru memakai signing key baru. Siapkan secret ini sekali d
 2. Di folder hasil clone repo, buka PowerShell dan jalankan:
 
    ~~~powershell
+   Set-ExecutionPolicy -Scope Process Bypass
    .\scripts\create-signing-secret.ps1
    ~~~
 
-3. Skrip membuat key di folder %USERPROFILE%\.idlix, menulis konfigurasi build lokal ke local.properties yang diabaikan Git, lalu mengirim nilai IDLIX_SIGNING_BUNDLE langsung ke Actions secrets repo. Nilai secret dan password tidak ditampilkan atau disimpan sebagai file bundle. Jika pengiriman secret gagal, coba lagi dengan opsi -ReuseExisting agar key yang sama dipakai kembali.
-4. Simpan salinan aman release-signing.jks. Key ini diperlukan untuk menandatangani semua rilis berikutnya. Jangan ganti key setelah rilis pertama dipublikasikan.
+3. Skrip membuat key di folder %USERPROFILE%\.idlix, menulis konfigurasi build lokal ke local.properties yang diabaikan Git, lalu mengirim nilai IDLIX_SIGNING_BUNDLE langsung ke Actions secrets repo. Nilai secret dan password tidak ditampilkan; password disimpan di local.properties agar laptop bisa membuat APK signed. Jika pengiriman secret gagal, coba lagi dengan opsi -ReuseExisting agar key yang sama dipakai kembali.
+4. Simpan cadangan aman release-signing.jks dan passwordnya. Keduanya dibutuhkan untuk menandatangani rilis berikutnya. Jangan ganti key setelah rilis pertama dipublikasikan.
 
 Skrip meminta konfirmasi CREATE-FRESH karena key baru membuat Android memperlakukan rilis 1.0.0 sebagai instalasi baru. Hapus versi IDLIX lama dari perangkat sebelum memasang rilis baru; data lokal dari aplikasi lama akan terhapus.
 
