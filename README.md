@@ -42,6 +42,8 @@ IDLIX menghadirkan katalog film dan serial dengan tampilan yang disesuaikan untu
 
 Rilis awal Seri 1.0 merangkum seluruh fitur IDLIX hingga versi sebelumnya:
 
+> **Sebelum memasang versi 1.0.0:** hapus IDLIX versi lama terlebih dahulu. Rilis baru memakai kunci aplikasi yang baru, sehingga Android tidak dapat memasangnya sebagai pembaruan langsung. Data lokal dari instalasi lama tidak ikut terbawa.
+
 - Aplikasi native untuk HP, tablet, dan Android TV, dengan navigasi sentuh atau remote.
 - Beranda dengan baris film dan serial, halaman Film, Serial, Jelajah, Pencarian, Riwayat, dan Pengaturan.
 - Layout tablet yang menyesuaikan orientasi portrait dan landscape.
@@ -54,7 +56,7 @@ Rilis awal Seri 1.0 merangkum seluruh fitur IDLIX hingga versi sebelumnya:
 - Pemutar Media3 untuk HLS, pilihan kualitas dan rasio tampilan bila disediakan sumber, subtitle, episode, riwayat, dan lanjut menonton.
 - Ikon aplikasi, ikon adaptif, themed icon, splash screen, dan banner Android TV beridentitas IDLIX.
 - Pemeriksaan update dari GitHub Releases, validasi ukuran dan SHA-256 APK, serta pemasangan yang tetap disetujui lewat Android.
-- Migrasi preferensi tema lama agar pembaruan menjaga pengaturan dan data aplikasi.
+- Pengaturan tema dan tontonan tersimpan di perangkat untuk pembaruan IDLIX berikutnya.
 
 ## Teknologi
 
