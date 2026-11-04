@@ -10,6 +10,7 @@ if ($Repository -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
     throw "Repository must use owner/name format."
 }
 
+$repoRoot = Split-Path -Parent $PSScriptRoot
 $keytool = Get-Command keytool -ErrorAction Stop
 $gh = Get-Command gh -ErrorAction SilentlyContinue
 $useGh = $false
@@ -64,7 +65,7 @@ else {
 $signingDirectory = Join-Path $env:USERPROFILE ".idlix"
 New-Item -ItemType Directory -Path $signingDirectory -Force | Out-Null
 $keyPath = Join-Path $signingDirectory "release-signing.jks"
-$propertiesPath = Join-Path (Get-Location).Path "local.properties"
+$propertiesPath = Join-Path $repoRoot "local.properties"
 $forwardKeyPath = $keyPath.Replace("\", "/")
 $existingLines = @()
 if (Test-Path -LiteralPath $propertiesPath) {
