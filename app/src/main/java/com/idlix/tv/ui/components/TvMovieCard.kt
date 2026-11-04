@@ -60,16 +60,20 @@ fun TvMovieCard(
     width: Int = 154,
     height: Int = 228,
     onFocus: (() -> Unit)? = null,
+    imageReferer: String? = null,
     onClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val imageRequest = remember(posterUrl) {
+    val imageRequest = remember(posterUrl, imageReferer) {
         ImageRequest.Builder(context)
             .data(posterUrl)
             .size(270, 400)
             .precision(Precision.INEXACT)
             .allowRgb565(true)
             .crossfade(false)
+            .apply {
+                imageReferer?.takeIf { it.isNotBlank() }?.let { header("Referer", it) }
+            }
             .build()
     }
 

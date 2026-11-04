@@ -217,13 +217,43 @@ class IdlixRepository(
         if (section == "network" && value.isNotBlank()) {
             val siteItems = SiteNetworkSource.getNetworkItems(value)
             if (siteItems.isNotEmpty()) {
+                // Keep the website's exact Network membership and order, then
+                // fill missing or fragile website covers from the IDLIX API.
+                val (catalogMovies, catalogSeries) = kotlinx.coroutines.coroutineScope {
+                    val moviesJob = async {
+                        cachedFirstPage("network-poster-movies") {
+                            idlixApi.getMovies(page = 1, limit = 100, sort = "createdAt").data
+                        }
+                    }
+                    val seriesJob = async {
+                        cachedFirstPage("network-poster-series") {
+                            idlixApi.getSeries(page = 1, limit = 100, sort = "createdAt").data
+                        }
+                    }
+                    moviesJob.await() to seriesJob.await()
+                }
+                val posterBySlug = HashMap<String, String>()
+                val posterByTitle = HashMap<String, String>()
+                (catalogMovies + catalogSeries.map { it.toMovieItem() }).forEach { catalogItem ->
+                    val poster = catalogItem.posterPath?.trim()?.takeIf { it.isNotEmpty() }
+                        ?: return@forEach
+                    val type = catalogItem.contentType.lowercase()
+                    posterBySlug["$type:${catalogItem.slug.lowercase()}"] = poster
+                    val titleKey = catalogItem.title.lowercase().filter { it.isLetterOrDigit() }
+                    if (titleKey.isNotEmpty()) posterByTitle["$type:$titleKey"] = poster
+                }
                 return@withContext siteItems.map { item ->
+                    val type = item.contentType.lowercase()
+                    val slugKey = "$type:${item.slug.lowercase()}"
+                    val titleKey = item.title.lowercase().filter { it.isLetterOrDigit() }
+                    val catalogPoster = posterBySlug[slugKey]
+                        ?: posterByTitle["$type:$titleKey"]
                     MovieItem(
                         id = item.slug,
                         title = item.title,
                         slug = item.slug,
                         contentType = item.contentType,
-                        posterPath = item.posterUrl,
+                        posterPath = catalogPoster ?: item.posterUrl,
                         releaseDate = item.year?.plus("-01-01")
                     )
                 }

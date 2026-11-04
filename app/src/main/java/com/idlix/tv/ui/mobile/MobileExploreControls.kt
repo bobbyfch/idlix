@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -47,6 +48,7 @@ import com.idlix.tv.ui.theme.NetflixWhite
 import com.idlix.tv.ui.theme.NetflixLightGray
 import com.idlix.tv.ui.theme.NetflixDarkCard
 import com.idlix.tv.ui.theme.NetflixDarkGray
+import com.idlix.tv.ui.components.NetworkBrandLogo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -119,6 +121,15 @@ internal fun MobileExploreControls(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(Icons.Default.Tune, null, tint = NetflixWhite, modifier = Modifier.size(19.dp))
+                val selectedChoice = choices.firstOrNull { it.first == value }
+                if (section == "network" && selectedChoice != null) {
+                    NetworkBrandLogo(
+                        slug = selectedChoice.first,
+                        label = selectedChoice.second,
+                        modifier = Modifier.size(20.dp),
+                        compact = true
+                    )
+                }
                 Text(
                     summary,
                     modifier = Modifier.weight(1f),
@@ -230,6 +241,14 @@ internal fun MobileExploreControls(
                                     .padding(horizontal = 15.dp, vertical = 11.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                if (section == "network") {
+                                    NetworkBrandLogo(
+                                        slug = id,
+                                        label = label,
+                                        modifier = Modifier.width(54.dp).height(22.dp)
+                                    )
+                                    Spacer(Modifier.width(10.dp))
+                                }
                                 Text(label, color = NetflixWhite, fontSize = 14.sp, modifier = Modifier.weight(1f))
                                 if (id == value) {
                                     Icon(Icons.Default.Check, null, tint = NetflixWhite, modifier = Modifier.size(20.dp))

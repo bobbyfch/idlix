@@ -81,6 +81,26 @@ object ApiClient {
             .build()
     }
 
+    private val imageHeaderInterceptor = Interceptor { chain ->
+        val original = chain.request()
+        val request = original.newBuilder()
+            .header("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")
+            .header("User-Agent", "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
+        if (original.header("Referer").isNullOrBlank()) {
+            request.header("Referer", "https://z2.idlixku.com/")
+        }
+        chain.proceed(request.build())
+    }
+
+    /** Image requests use browser-like headers without the API client's Origin. */
+    val imageHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(imageHeaderInterceptor)
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(25, TimeUnit.SECONDS)
+            .build()
+    }
+
     private fun buildRetrofit(baseUrl: String): Retrofit {
         return Retrofit.Builder()
             .baseUrl(baseUrl)

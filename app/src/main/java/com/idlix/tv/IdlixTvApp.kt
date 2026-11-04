@@ -37,7 +37,7 @@ class IdlixTvApp : Application(), ImageLoaderFactory {
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
-            .okHttpClient(ApiClient.okHttpClient)
+            .okHttpClient(ApiClient.imageHttpClient)
             .allowRgb565(true)
             .respectCacheHeaders(false)
             .decoderDispatcher(Dispatchers.IO)

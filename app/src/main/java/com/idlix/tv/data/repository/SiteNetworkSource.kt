@@ -46,6 +46,11 @@ object SiteNetworkSource {
     @Volatile private var cachedNetworks: Pair<Long, List<SiteNetwork>>? = null
     private val itemCache = ConcurrentHashMap<String, Pair<Long, List<SiteNetworkTitle>>>()
 
+    fun networkPageUrl(slug: String): String {
+        val normalized = slug.lowercase(Locale.ROOT)
+        return if (slugPattern.matches(normalized)) "$ROOT/network/$normalized" else "$ROOT/network"
+    }
+
     fun parseNetworks(html: String): List<SiteNetwork> {
         val doc = Jsoup.parse(html, INDEX)
         return doc.select("a[href]").mapNotNull { anchor ->

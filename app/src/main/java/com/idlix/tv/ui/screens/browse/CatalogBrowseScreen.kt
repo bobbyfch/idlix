@@ -50,6 +50,8 @@ import com.idlix.tv.data.repository.CinemetaCollectionSource
 import com.idlix.tv.data.local.SavedCollectionsStore
 import com.idlix.tv.ui.components.TvLoadingSpinner
 import com.idlix.tv.ui.components.TvMovieCard
+import com.idlix.tv.ui.components.NetworkBrandLogo
+import com.idlix.tv.data.repository.SiteNetworkSource
 import com.idlix.tv.ui.theme.NetflixBlack
 import com.idlix.tv.ui.theme.NetflixDarkCard
 import com.idlix.tv.ui.theme.NetflixLightGray
@@ -359,12 +361,32 @@ fun CatalogBrowseScreen(
                                     shape = ButtonDefaults.shape(shape = RoundedCornerShape(14.dp)),
                                     contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                                 ) {
-                                    Text(
-                                        choice.label,
-                                        fontSize = 14.sp,
-                                        fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
-                                        maxLines = 1
-                                    )
+                                    if (section == "network") {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(9.dp)
+                                        ) {
+                                            NetworkBrandLogo(
+                                                slug = choice.value,
+                                                label = choice.label,
+                                                modifier = Modifier.width(50.dp).height(22.dp)
+                                            )
+                                            Text(
+                                                choice.label,
+                                                fontSize = 14.sp,
+                                                fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                                                maxLines = 1
+                                            )
+                                        }
+                                    } else {
+                                        Text(
+                                            choice.label,
+                                            fontSize = 14.sp,
+                                            fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                                            maxLines = 1
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -465,6 +487,7 @@ fun CatalogBrowseScreen(
                                         posterUrl = movie.fullPosterUrl,
                                         rating = movie.formattedRating,
                                         quality = movie.sourceBadge,
+                                        imageReferer = if (section == "network") SiteNetworkSource.networkPageUrl(selected) else null,
                                         onClick = { onNavigateToDetail(movie.contentType, movie.slug) }
                                     )
                                 }

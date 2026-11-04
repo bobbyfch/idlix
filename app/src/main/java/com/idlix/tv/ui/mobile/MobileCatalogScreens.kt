@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -52,6 +53,8 @@ import com.idlix.tv.data.model.MovieItem
 import com.idlix.tv.data.repository.IdlixRepository
 import com.idlix.tv.data.repository.CinemetaCollectionSource
 import com.idlix.tv.data.repository.SiteCatalogReferences
+import com.idlix.tv.data.repository.SiteNetworkSource
+import com.idlix.tv.ui.components.NetworkBrandLogo
 import com.idlix.tv.data.local.SavedCollectionsStore
 import com.idlix.tv.ui.screens.browse.choicesFor
 import com.idlix.tv.ui.screens.browse.catalogSections
@@ -169,7 +172,15 @@ private fun MobileNetworkOriginalsRow(onBrowse: OpenBrowse) {
                 MobileFilterChip(
                     label = network.name,
                     selected = false,
-                    onClick = { onBrowse("network", network.slug, "all") }
+                    onClick = { onBrowse("network", network.slug, "all") },
+                    leadingIcon = {
+                        NetworkBrandLogo(
+                            slug = network.slug,
+                            label = network.name,
+                            modifier = Modifier.size(18.dp),
+                            compact = true
+                        )
+                    }
                 )
             }
         }
@@ -571,6 +582,7 @@ fun MobileExploreScreen(
                         poster = item.fullPosterUrl,
                         rating = item.formattedRating,
                         quality = item.sourceBadge,
+                        imageReferer = if (section == "network") SiteNetworkSource.networkPageUrl(value) else null,
                         onClick = { onDetail(item.contentType, item.slug) },
                         fullWidth = true
                     )

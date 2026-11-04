@@ -41,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.idlix.tv.data.model.MovieItem
 import com.idlix.tv.data.repository.IdlixRepository
 import com.idlix.tv.data.repository.TitleLogoRepository
@@ -66,11 +68,13 @@ private val RatingGold = Color(0xFFFFDA79)
 internal fun MobileFilterChip(
     label: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    leadingIcon: (@Composable () -> Unit)? = null
 ) {
     FilterChip(
         selected = selected,
         onClick = onClick,
+        leadingIcon = leadingIcon,
         label = {
             Text(
                 label,
@@ -103,8 +107,20 @@ internal fun MobilePosterCard(
     modifier: Modifier = Modifier,
     fullWidth: Boolean = false,
     quality: String? = null,
-    progressLabel: String? = null
+    progressLabel: String? = null,
+    imageReferer: String? = null
 ) {
+    val context = LocalContext.current
+    val imageRequest = remember(poster, imageReferer) {
+        ImageRequest.Builder(context)
+            .data(poster)
+            .crossfade(false)
+            .apply {
+                imageReferer?.takeIf { it.isNotBlank() }?.let { header("Referer", it) }
+            }
+            .build()
+    }
+
     Card(
         modifier = if (fullWidth) modifier.fillMaxWidth() else modifier.width(146.dp),
         onClick = onClick,
@@ -122,7 +138,7 @@ internal fun MobilePosterCard(
                     .background(NetflixDarkGray)
             ) {
                 AsyncImage(
-                    model = poster,
+                    model = imageRequest,
                     contentDescription = title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
