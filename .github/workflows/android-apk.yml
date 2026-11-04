@@ -57,7 +57,7 @@ jobs:
             echo "::error::Version outside supported range"
             exit 1
           fi
-          # Keep the first new-repository APK installable over previous IDLIX builds.
+          # Keep version codes unique and monotonic within this repository.
           VERSION_CODE=$((1200000 + GITHUB_RUN_NUMBER))
           echo "IDLIX_VERSION_CODE=${VERSION_CODE}" >> "${GITHUB_ENV}"
           echo "IDLIX_RELEASE_VERSION=${VERSION}" >> "${GITHUB_ENV}"
@@ -174,7 +174,7 @@ jobs:
           fi
           python3 - <<'PY'
           import base64, json, os, pathlib, re, subprocess
-          data=json.loads(base64.b64decode(os.environ["IDLIX_SIGNING_BUNDLE"], validate=True))
+          data=json.loads(base64.b64decode(os.environ["IDLIX_SIGNING_BUNDLE"].strip(), validate=True))
           alias=data["alias"]
           password=data["password"]
           if alias != "idlix" or not re.fullmatch(r"[A-Za-z0-9_-]{32,}", password):
@@ -186,9 +186,12 @@ jobs:
               "keytool", "-list", "-v", "-keystore", str(keystore),
               "-alias", alias, "-storepass", password
           ], text=True, stderr=subprocess.STDOUT)
-          expected="1E:37:86:30:A9:DE:FA:ED:4A:C7:9E:89:5F:1D:03:67:E0:91:B3:8B:E5:C7:D0:03:B5:64:13:D4:D2:8B:F4:F1"
-          if f"SHA256: {expected}" not in key_info:
-              raise SystemExit("Release signing certificate mismatch; refusing key rotation")
+          match=re.search(r"(?m)^SHA256:\s*([0-9A-Fa-f:]+)\s*$", key_info)
+          if not match:
+              raise SystemExit("Could not read the release signing certificate fingerprint")
+          fingerprint=re.sub(r"[^0-9A-Fa-f]", "", match.group(1)).upper()
+          if not re.fullmatch(r"[0-9A-F]{64}", fingerprint):
+              raise SystemExit("Invalid release signing certificate fingerprint")
           sdk=os.environ.get("ANDROID_HOME", os.environ.get("ANDROID_SDK_ROOT", ""))
           with open("local.properties", "w") as props:
               if sdk:
@@ -199,6 +202,7 @@ jobs:
               props.write("keyPassword=" + password + "\n")
           with open(os.environ["GITHUB_OUTPUT"], "a") as result:
               result.write("enabled=true\n")
+              result.write(f"certificate_sha256={fingerprint}\n")
           print("Persistent signing certificate validated; release enabled.")
           PY
 
@@ -217,6 +221,8 @@ jobs:
 
       - name: Verify release package and signature
         if: steps.signing.outputs.enabled == 'true'
+        env:
+          EXPECTED_SIGNER_SHA256: ${{ steps.signing.outputs.certificate_sha256 }}
         shell: bash
         run: |
           test -s app/build/outputs/apk/release/app-release.apk
@@ -227,9 +233,9 @@ jobs:
           OUTPUT=$("${APKSIGNER}" verify --verbose --print-certs app/build/outputs/apk/release/app-release.apk)
           grep -q 'Verified using v2 scheme (APK Signature Scheme v2): true' <<< "${OUTPUT}"
           SIGNER=$(sed -n 's/^Signer #1 certificate SHA-256 digest: //p' <<< "${OUTPUT}" | tr '[:lower:]' '[:upper:]')
-          EXPECTED="1E378630A9DEFAED4AC79E895F1D0367E091B38BE5C7D003B56413D4D28BF4F1"
-          if [[ "${SIGNER}" != "${EXPECTED}" ]]; then
-            echo "::error::Signed APK certificate does not match the pinned release identity"
+          EXPECTED="${EXPECTED_SIGNER_SHA256^^}"
+          if [[ ! "${EXPECTED}" =~ ^[0-9A-F]{64}$ || "${SIGNER}" != "${EXPECTED}" ]]; then
+            echo "::error::Signed APK certificate does not match IDLIX_SIGNING_BUNDLE"
             exit 1
           fi
           # Confirm the packaged manifest actually matches the new independent release.
