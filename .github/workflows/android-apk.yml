@@ -186,7 +186,7 @@ jobs:
               "keytool", "-list", "-v", "-keystore", str(keystore),
               "-alias", alias, "-storepass", password
           ], text=True, stderr=subprocess.STDOUT)
-          match=re.search(r"(?m)^SHA256:\s*([0-9A-Fa-f:]+)\s*$", key_info)
+          match=re.search(r"(?m)^\s*SHA256:\s*([0-9A-Fa-f:]+)\s*$", key_info)
           if not match:
               raise SystemExit("Could not read the release signing certificate fingerprint")
           fingerprint=re.sub(r"[^0-9A-Fa-f]", "", match.group(1)).upper()
