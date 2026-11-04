@@ -31,8 +31,21 @@ internal object SiteImageUrl {
     )
 
     fun from(container: Element): String? {
-        val elements = listOf(container) +
-            container.select("img, picture source, [data-bg], [data-background], [style]")
+        var scope = container
+        repeat(6) {
+            findWithin(scope)?.let { return it }
+
+            val parent = scope.parent() ?: return null
+            // Stop at a shared list/grid so a neighbouring title cannot donate its poster.
+            if (containsMultipleContentItems(parent)) return null
+            scope = parent
+        }
+        return null
+    }
+
+    private fun findWithin(scope: Element): String? {
+        val elements = listOf(scope) +
+            scope.select("img, picture source, [data-bg], [data-background], [style]")
         for (element in elements) {
             for (attribute in imageAttributes) {
                 val raw = element.attr(attribute).trim()
@@ -57,6 +70,21 @@ internal object SiteImageUrl {
             }
         }
         return null
+    }
+
+    private fun containsMultipleContentItems(scope: Element): Boolean {
+        val contentPath = Regex("""/(?:movie|series)/[a-z0-9-]+/?$""", RegexOption.IGNORE_CASE)
+        val paths = LinkedHashSet<String>()
+        for (link in scope.select("a[href]")) {
+            val href = link.absUrl("href").substringBefore('?').trimEnd('/')
+            if (href.isBlank()) continue
+            val path = runCatching { URI(href).path.orEmpty() }.getOrDefault("").trimEnd('/')
+            if (contentPath.matches(path)) {
+                paths.add(path.lowercase(java.util.Locale.ROOT))
+                if (paths.size > 1) return true
+            }
+        }
+        return false
     }
 
     private fun resolve(raw: String, baseUri: String): String? {

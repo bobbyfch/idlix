@@ -1,3 +1,3 @@
 ## Yang baru
 
-- Sampul film dan serial di Network Originals sekarang dibaca lebih lengkap, jadi daftar platform lebih jelas di HP dan Android TV.
+- Sampul yang sebelumnya kosong pada sebagian daftar Network Originals kini dicari dari kartu tayangan yang tepat di HP dan Android TV.
