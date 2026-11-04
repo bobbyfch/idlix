@@ -24,9 +24,8 @@ android {
         applicationId = "com.idlix.tv"
         minSdk = 26
         targetSdk = 35
-        // CI run numbers are monotonic for this workflow, so every published
-        // APK can update the previous one without a version-code downgrade.
-        // Keep local release builds above the previous public version code.
+        // CI run numbers are monotonic within this repository, so each release
+        // can update the prior release signed with the same IDLIX key.
         versionCode = System.getenv("IDLIX_VERSION_CODE")?.toIntOrNull() ?: 1_200_000
         // Release version is exported once by Actions; same value used in APK,
         // GitHub tag, release title, and download filename.
