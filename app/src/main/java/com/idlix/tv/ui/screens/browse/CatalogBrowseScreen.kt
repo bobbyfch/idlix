@@ -172,12 +172,15 @@ fun CatalogBrowseScreen(
     val preferences by TvPreferencesStore.preferences.collectAsState()
     val savedCollections by SavedCollectionsStore.saved.collectAsState()
     var liveGenres by remember(section) { mutableStateOf<List<BrowseChoice>>(emptyList()) }
+    var liveNetworks by remember(section) { mutableStateOf<List<BrowseChoice>>(emptyList()) }
     val fallbackChoices = remember(section) { choicesFor(section) }
     // The public web exposes 23 genres; keep the full reference taxonomy
     // even when /api/genres returns a partial list.
-    val choices = if (section == "genre") {
-        (liveGenres + fallbackChoices).distinctBy { it.value.lowercase() }
-    } else fallbackChoices
+    val choices = when (section) {
+        "genre" -> (liveGenres + fallbackChoices).distinctBy { it.value.lowercase() }
+        "network" -> (liveNetworks + fallbackChoices).distinctBy { it.value.lowercase() }
+        else -> fallbackChoices
+    }
     var selected by remember(section, initialValue) {
         mutableStateOf(initialValue.ifBlank { choices.firstOrNull()?.value.orEmpty() })
     }
@@ -200,11 +203,14 @@ fun CatalogBrowseScreen(
     }
 
     LaunchedEffect(section) {
-        if (section == "genre") {
-            liveGenres = repository.getAvailableGenres()
+        when (section) {
+            "genre" -> liveGenres = repository.getAvailableGenres()
                 .filter { it.slug.isNotBlank() && it.name.isNotBlank() }
                 .distinctBy { it.slug }
                 .sortedBy { it.name }
+                .map { BrowseChoice(it.name, it.slug) }
+            "network" -> liveNetworks = repository.getAvailableNetworks()
+                .filter { it.slug.isNotBlank() && it.name.isNotBlank() }
                 .map { BrowseChoice(it.name, it.slug) }
         }
     }
@@ -247,6 +253,8 @@ fun CatalogBrowseScreen(
                         ?: com.idlix.tv.data.repository.SiteCatalogReferences.collections
                             .firstOrNull { it.slug == initialValue }?.title
                         ?: initialValue.replace('-', ' ').replaceFirstChar { it.uppercaseChar() }
+                else if (section == "network")
+                    choices.firstOrNull { it.value == selected }?.label?.plus(" Originals") ?: titleFor(section)
                 else titleFor(section),
                 color = NetflixWhite, fontSize = 28.sp, fontWeight = FontWeight.Bold
             )
@@ -269,7 +277,8 @@ fun CatalogBrowseScreen(
         Text(
             when (section) {
                 "explore" -> "Pilih kategori dengan tombol arah dan OK pada remote TV."
-                "network" -> "Judul orisinal pilihan dan hasil dengan metadata network terverifikasi. Tidak semua katalog memiliki metadata."
+                "network" -> "Film dan serial dari halaman " +
+                    (choices.firstOrNull { it.value == selected }?.label ?: "network") + " di IDLIX."
                 "shorts" -> "Film pendek berdasarkan metadata durasi dan penanda dari katalog."
                 "collections" -> if (CinemetaCollectionSource.isExternalCollection(initialValue))
                     "Kurasi Cinemeta · hanya hasil yang benar-benar cocok di IDLIX yang ditampilkan."

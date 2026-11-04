@@ -214,6 +214,22 @@ class IdlixRepository(
             }
         }
 
+        if (section == "network" && value.isNotBlank()) {
+            val siteItems = SiteNetworkSource.getNetworkItems(value)
+            if (siteItems.isNotEmpty()) {
+                return@withContext siteItems.map { item ->
+                    MovieItem(
+                        id = item.slug,
+                        title = item.title,
+                        slug = item.slug,
+                        contentType = item.contentType,
+                        posterPath = item.posterUrl,
+                        releaseDate = item.year?.plus("-01-01")
+                    )
+                }
+            }
+        }
+
         val genre = value.takeIf { section == "genre" && it.isNotBlank() }
         val items = linkedMapOf<String, MovieItem>()
 
@@ -334,6 +350,8 @@ class IdlixRepository(
     }
 
     suspend fun getCollectionTitles(): CollectionListing = SiteCollectionSource.getCollections()
+
+    suspend fun getAvailableNetworks(): List<SiteNetwork> = SiteNetworkSource.getNetworks()
 
     /** User-facing search distinguishes a failed request from zero matches. */
     suspend fun searchStrict(query: String): List<SearchResultItem> = withContext(Dispatchers.IO) {

@@ -25,6 +25,42 @@ object SiteCatalogReferences {
     )
     val collectionTitles: List<String> get() = collections.map { it.title }
 
+    /** Providers shown by the live IDLIX /network index, in its published order. */
+    val networkProviders = listOf(
+        SiteNetwork("Netflix", "netflix"),
+        SiteNetwork("HBO", "hbo"),
+        SiteNetwork("Prime Video", "prime-video"),
+        SiteNetwork("Disney+", "disney-plus"),
+        SiteNetwork("Apple TV+", "apple-tv-plus"),
+        SiteNetwork("Tencent Video", "tencent-video"),
+        SiteNetwork("tvN", "tvn"),
+        SiteNetwork("iQIYI", "iqiyi"),
+        SiteNetwork("SBS", "sbs"),
+        SiteNetwork("MBC", "mbc"),
+        SiteNetwork("TV Tokyo", "tv-tokyo"),
+        SiteNetwork("KBS", "kbs"),
+        SiteNetwork("JTBC", "jtbc"),
+        SiteNetwork("Fuji TV", "fuji-tv"),
+        SiteNetwork("Youku", "youku"),
+        SiteNetwork("NBC", "nbc"),
+        SiteNetwork("TVING", "tving"),
+        SiteNetwork("Paramount+", "paramount-plus"),
+        SiteNetwork("Mango TV", "mango-tv"),
+        SiteNetwork("BBC", "bbc"),
+        SiteNetwork("Wavve", "wavve"),
+        SiteNetwork("FOX", "fox"),
+        SiteNetwork("Peacock", "peacock"),
+        SiteNetwork("CBS", "cbs"),
+        SiteNetwork("YouTube", "youtube"),
+        SiteNetwork("bilibili", "bilibili"),
+        SiteNetwork("Showtime", "showtime"),
+        SiteNetwork("Cartoon Network", "cartoon-network"),
+        SiteNetwork("STARZ", "starz"),
+        SiteNetwork("Sky", "sky"),
+        SiteNetwork("Channel 4", "channel-4"),
+        SiteNetwork("Crunchyroll", "crunchyroll")
+    )
+
     val networkTitleSeeds: Map<String, List<String>> = mapOf(
         "netflix" to listOf(
             "The Night Agent", "Black Mirror", "The Witcher",

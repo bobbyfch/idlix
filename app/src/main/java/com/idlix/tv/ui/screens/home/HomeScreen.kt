@@ -1,11 +1,18 @@
 package com.idlix.tv.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.items as rowItems
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -17,10 +24,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.tv.material3.Button
 import androidx.tv.material3.Text
 import com.idlix.tv.R
 import com.idlix.tv.data.model.MovieItem
+import com.idlix.tv.data.repository.SiteCatalogReferences
 import com.idlix.tv.ui.components.TvContinueWatchingRow
 import com.idlix.tv.ui.components.TvCatalogGateway
 import com.idlix.tv.ui.components.TvHeroBillboard
@@ -28,6 +38,40 @@ import com.idlix.tv.ui.components.TvLoadingSpinner
 import com.idlix.tv.ui.components.TvSwimlaneRow
 import com.idlix.tv.ui.theme.NetflixBlack
 import com.idlix.tv.ui.theme.NetflixWhite
+
+@Composable
+private fun TvNetworkOriginalsRow(onBrowse: (String, String, String) -> Unit) {
+    val featuredNetworks = SiteCatalogReferences.networkProviders.take(5)
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Network Originals",
+                color = NetflixWhite,
+                fontSize = 18.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            )
+            Button(onClick = { onBrowse("network", "", "all") }) {
+                Text("Lihat semua")
+            }
+        }
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 8.dp)
+        ) {
+            rowItems(featuredNetworks, key = { it.slug }) { network ->
+                Button(onClick = { onBrowse("network", network.slug, "all") }) {
+                    Text(network.name)
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun HomeScreen(
@@ -123,6 +167,8 @@ fun HomeScreen(
                         )
                     }
                 }
+                item { TvNetworkOriginalsRow(onBrowse = onNavigateToBrowse) }
+
                 // 3. Swimlane: Sedang Tren Sekarang
                 item {
                     TvSwimlaneRow(

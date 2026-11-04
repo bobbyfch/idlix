@@ -97,7 +97,7 @@ internal fun MobileExploreControls(
     ) {
         Text(
             when (section) {
-                "network" -> "Network"
+                "network" -> choiceName?.plus(" Originals") ?: "Network"
                 "shorts" -> "Shorts"
                 else -> "Jelajah"
             }, color = NetflixWhite, fontSize = 25.sp, fontWeight = FontWeight.Bold
@@ -189,6 +189,16 @@ internal fun MobileExploreControls(
                     Text("Filter Jelajah", color = NetflixWhite, fontSize = 21.sp, fontWeight = FontWeight.Bold)
                     TextButton(onClick = { showFilters = false }) {
                         Text("Terapkan", color = NetflixWhite)
+                    }
+                }
+                Text("Jelajah berdasarkan", color = NetflixLightGray, fontSize = 13.sp)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                    items(sections, key = { it.first }) { (id, label) ->
+                        MobileFilterChip(
+                            label = label,
+                            selected = section == id,
+                            onClick = { onSectionSelected(id) }
+                        )
                     }
                 }
                 if (choices.isNotEmpty()) {

@@ -51,6 +51,7 @@ import com.idlix.tv.data.model.Genre
 import com.idlix.tv.data.model.MovieItem
 import com.idlix.tv.data.repository.IdlixRepository
 import com.idlix.tv.data.repository.CinemetaCollectionSource
+import com.idlix.tv.data.repository.SiteCatalogReferences
 import com.idlix.tv.data.local.SavedCollectionsStore
 import com.idlix.tv.ui.screens.browse.choicesFor
 import com.idlix.tv.ui.screens.browse.catalogSections
@@ -124,6 +125,7 @@ fun MobileHomeScreen(
             }
         }
         item { MobileMovieRow("Sedang Tren", state.trending, onItemClick = { onDetail(it.contentType, it.slug) }) }
+        item { MobileNetworkOriginalsRow(onBrowse = onBrowse) }
         if (state.trendingCountry.isNotEmpty()) item {
             MobileMovieRow("Trending Indonesia", state.trendingCountry) {
                 onDetail(it.contentType, it.slug)
@@ -141,6 +143,35 @@ fun MobileHomeScreen(
         item { MobileMovieRow("Aksi & Petualangan", state.actionMovies, onItemClick = { onDetail(it.contentType, it.slug) }) }
         items(state.extraShelves, key = { it.title }) { shelf ->
             MobileMovieRow(shelf.title, shelf.items) { onDetail(it.contentType, it.slug) }
+        }
+    }
+}
+
+@Composable
+private fun MobileNetworkOriginalsRow(onBrowse: OpenBrowse) {
+    val featuredNetworks = SiteCatalogReferences.networkProviders.take(5)
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        ) {
+            Text("Network Originals", color = NetflixWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            TextButton(onClick = { onBrowse("network", "", "all") }) {
+                Text("Lihat semua", color = NetflixWhite, fontSize = 12.sp)
+            }
+        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            items(featuredNetworks, key = { it.slug }) { network ->
+                MobileFilterChip(
+                    label = network.name,
+                    selected = false,
+                    onClick = { onBrowse("network", network.slug, "all") }
+                )
+            }
         }
     }
 }
@@ -405,6 +436,7 @@ fun MobileExploreScreen(
     val repository = remember { IdlixRepository() }
     val savedCollections by SavedCollectionsStore.saved.collectAsState()
     var genres by remember { mutableStateOf<List<Genre>>(emptyList()) }
+    var networks by remember { mutableStateOf<List<BrowseChoice>>(emptyList()) }
     var section by rememberSaveable(initialSection) { mutableStateOf(initialSection) }
     var value by rememberSaveable(initialSection, initialValue) {
         mutableStateOf(initialValue.ifBlank { choicesFor(initialSection).firstOrNull()?.value.orEmpty() })
@@ -420,7 +452,12 @@ fun MobileExploreScreen(
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(repository, section) {
-        if (section == "genre") genres = repository.getAvailableGenres()
+        when (section) {
+            "genre" -> genres = repository.getAvailableGenres()
+            "network" -> networks = repository.getAvailableNetworks()
+                .filter { it.slug.isNotBlank() && it.name.isNotBlank() }
+                .map { BrowseChoice(it.name, it.slug) }
+        }
     }
     LaunchedEffect(section, value, retryTick, scanPages) {
         loading = true
@@ -443,6 +480,9 @@ fun MobileExploreScreen(
             choicesFor("genre"))
             .distinctBy { it.value.lowercase() }
             .sortedBy { it.label }
+            .map { it.value to it.label }
+    } else if (section == "network") {
+        (networks + choicesFor(section)).distinctBy { it.value.lowercase() }
             .map { it.value to it.label }
     } else {
         choicesFor(section).map { it.value to it.label }
