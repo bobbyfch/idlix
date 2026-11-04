@@ -84,7 +84,7 @@ object ApiClient {
     private val imageHeaderInterceptor = Interceptor { chain ->
         val original = chain.request()
         val request = original.newBuilder()
-            .header("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")
+            .header("Accept", "image/webp,image/svg+xml,image/jpeg,image/png,image/avif;q=0,*/*;q=0.8")
             .header("User-Agent", "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
         if (original.header("Referer").isNullOrBlank()) {
             request.header("Referer", "https://z2.idlixku.com/")

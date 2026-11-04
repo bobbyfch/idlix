@@ -150,6 +150,7 @@ dependencies {
 
     // Coil for TV image loading
     implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 
     testImplementation(libs.junit)
     androidTestImplementation("androidx.test:core:1.6.1")

@@ -1,4 +1,3 @@
 ## Yang baru
 
-- Navigasi dan penanda fokus remote kini lebih jelas saat menjelajah katalog di Android TV.
-- Tampilan sorotan dan kartu tontonan dirapikan agar tetap mudah dibaca di tema terang, gelap, maupun OLED.
+- Sampul film dan serial di Jelajah kini tampil lebih konsisten di HP dan Android TV, termasuk perangkat TV lama.
