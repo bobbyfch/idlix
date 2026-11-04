@@ -23,7 +23,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Could not inspect Actions secrets for $Repository."
 }
 $signingSecretExists = [bool]($secretNames | Where-Object { $_ -match '^\s*IDLIX_SIGNING_BUNDLE\s' })
-if ($signingSecretExists -and -not $ReplaceExistingSecret) {
+if ($signingSecretExists -and -not ($ReplaceExistingSecret -or $ReuseExisting)) {
     throw "IDLIX_SIGNING_BUNDLE already exists. Use -ReplaceExistingSecret only if you intend to rotate the signing identity."
 }
 
