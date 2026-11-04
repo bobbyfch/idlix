@@ -11,18 +11,32 @@ if ($Repository -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') {
 }
 
 $keytool = Get-Command keytool -ErrorAction Stop
-$gh = Get-Command gh -ErrorAction Stop
+$gh = Get-Command gh -ErrorAction SilentlyContinue
+$useGh = $false
 
-& $gh.Source auth status --hostname github.com *> $null
-if ($LASTEXITCODE -ne 0) {
-    throw "Sign in to GitHub CLI first by running: gh auth login"
+if ($null -ne $gh) {
+    & $gh.Source auth status --hostname github.com *> $null
+    if ($LASTEXITCODE -eq 0) {
+        $useGh = $true
+    }
+    else {
+        Write-Warning "GitHub CLI is not logged in. The script will use the GitHub browser page instead."
+    }
+}
+else {
+    Write-Host "GitHub CLI was not found. The script will use the GitHub browser page instead."
 }
 
-$secretNames = & $gh.Source secret list --repo $Repository --app actions
-if ($LASTEXITCODE -ne 0) {
-    throw "Could not inspect Actions secrets for $Repository."
+$secretNames = @()
+if ($useGh) {
+    $secretNames = & $gh.Source secret list --repo $Repository --app actions
+    if ($LASTEXITCODE -ne 0) {
+        $useGh = $false
+        $secretNames = @()
+        Write-Warning "GitHub CLI cannot manage this repository's secrets. The script will use the GitHub browser page instead."
+    }
 }
-$signingSecretExists = [bool]($secretNames | Where-Object { $_ -match '^\s*IDLIX_SIGNING_BUNDLE\s' })
+$signingSecretExists = $useGh -and [bool]($secretNames | Where-Object { $_ -match '^\s*IDLIX_SIGNING_BUNDLE\s' })
 if ($signingSecretExists -and -not ($ReplaceExistingSecret -or $ReuseExisting)) {
     throw "IDLIX_SIGNING_BUNDLE already exists. Use -ReplaceExistingSecret only if you intend to rotate the signing identity."
 }
@@ -133,30 +147,48 @@ $bundleObject = @{
 $bundleJson = $bundleObject | ConvertTo-Json -Compress
 $bundle = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($bundleJson))
 
-$startInfo = New-Object Diagnostics.ProcessStartInfo
-$startInfo.FileName = $gh.Source
-$startInfo.Arguments = "secret set IDLIX_SIGNING_BUNDLE --repo $Repository"
-$startInfo.UseShellExecute = $false
-$startInfo.RedirectStandardInput = $true
-$startInfo.RedirectStandardOutput = $true
-$startInfo.RedirectStandardError = $true
+if ($useGh) {
+    $startInfo = New-Object Diagnostics.ProcessStartInfo
+    $startInfo.FileName = $gh.Source
+    $startInfo.Arguments = "secret set IDLIX_SIGNING_BUNDLE --repo $Repository"
+    $startInfo.UseShellExecute = $false
+    $startInfo.RedirectStandardInput = $true
+    $startInfo.RedirectStandardOutput = $true
+    $startInfo.RedirectStandardError = $true
 
-$process = [Diagnostics.Process]::Start($startInfo)
-$stdoutTask = $process.StandardOutput.ReadToEndAsync()
-$stderrTask = $process.StandardError.ReadToEndAsync()
-$process.StandardInput.Write($bundle)
-$process.StandardInput.Close()
-$process.WaitForExit()
-$stdout = $stdoutTask.GetAwaiter().GetResult()
-$stderr = $stderrTask.GetAwaiter().GetResult()
+    $process = [Diagnostics.Process]::Start($startInfo)
+    $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+    $stderrTask = $process.StandardError.ReadToEndAsync()
+    $process.StandardInput.Write($bundle)
+    $process.StandardInput.Close()
+    $process.WaitForExit()
+    $stdout = $stdoutTask.GetAwaiter().GetResult()
+    $stderr = $stderrTask.GetAwaiter().GetResult()
 
-if ($process.ExitCode -ne 0) {
-    if ($stderr) {
-        Write-Error $stderr
+    if ($process.ExitCode -ne 0) {
+        if ($stderr) {
+            Write-Error $stderr
+        }
+        throw "GitHub CLI could not save IDLIX_SIGNING_BUNDLE. The key remains at $keyPath; retry with -ReuseExisting."
     }
-    throw "GitHub CLI could not save IDLIX_SIGNING_BUNDLE. The key remains at $keyPath; retry with -ReuseExisting."
+}
+else {
+    $settingsUrl = "https://github.com/$Repository/settings/secrets/actions"
+    Set-Clipboard -Value $bundle
+    try {
+        Start-Process $settingsUrl
+        Write-Host "Secret sudah disalin ke clipboard dan halaman Actions secrets dibuka."
+        Write-Host "Di GitHub, tambahkan atau perbarui secret bernama IDLIX_SIGNING_BUNDLE, tempel nilainya, lalu klik Add secret."
+        $confirmation = Read-Host "Ketik SECRET-SAVED setelah secret tersimpan di GitHub"
+        if ($confirmation -cne "SECRET-SAVED") {
+            throw "Secret belum dikonfirmasi tersimpan. Key tetap aman di $keyPath; jalankan ulang dengan -ReuseExisting."
+        }
+    }
+    finally {
+        Set-Clipboard -Value ""
+    }
 }
 
-Write-Host "Fresh IDLIX_SIGNING_BUNDLE was saved to $Repository."
+Write-Host "Signing key disiapkan untuk $Repository."
 Write-Host "Local release signing is ready through local.properties."
 Write-Host "Keep this key safe: $keyPath"
