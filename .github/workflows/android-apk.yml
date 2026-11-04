@@ -58,7 +58,7 @@ jobs:
             exit 1
           fi
           # Keep version codes unique and monotonic within this repository.
-          VERSION_CODE=$((1200000 + GITHUB_RUN_NUMBER))
+          VERSION_CODE=$((1200000 + GITHUB_RUN_NUMBER * 1000 + 10#$PATCH))
           echo "IDLIX_VERSION_CODE=${VERSION_CODE}" >> "${GITHUB_ENV}"
           echo "IDLIX_RELEASE_VERSION=${VERSION}" >> "${GITHUB_ENV}"
           echo "name=${VERSION}" >> "${GITHUB_OUTPUT}"

@@ -1,24 +1,25 @@
-# Menyiapkan signing key IDLIX
+# Signing dan rilis IDLIX
 
-Rilis pertama di repo baru memakai signing key baru. Siapkan secret ini sekali dari laptop Windows sebelum meminta APK release:
+## Siapkan satu kali
 
-1. Unduh ZIP repo bobbyfch/idlix dan ekstrak ke laptop Windows.
-2. Pastikan JDK 21 terpasang. GitHub CLI (gh) bersifat opsional; jika tidak ada, skrip akan membuka halaman GitHub dan menyalin secret ke clipboard.
-3. Dari folder hasil ekstrak, klik dua kali RUN-IDLIX-SIGNING.bat dan ketik CREATE-FRESH saat diminta. Di halaman GitHub, tambahkan atau perbarui secret IDLIX_SIGNING_BUNDLE, tempel nilainya, lalu klik Add secret. Kembali ke jendela skrip dan ketik SECRET-SAVED.
+1. Di laptop Windows, pasang JDK 21 dan unduh ZIP dari [repo IDLIX](https://github.com/bobbyfch/idlix).
+2. Ekstrak ZIP, lalu jalankan `RUN-IDLIX-SIGNING.bat`.
+3. Ketik `CREATE-FRESH` saat diminta. Skrip membuat kunci rilis di `%USERPROFILE%\.idlix` dan menyiapkan konfigurasi lokal dalam `local.properties`.
+4. Saat halaman GitHub terbuka, tambahkan secret bernama `IDLIX_SIGNING_BUNDLE`, tempel nilai yang sudah disalin skrip, lalu simpan. Kembali ke jendela skrip dan ketik `SECRET-SAVED`.
 
-3. Skrip membuat key di folder %USERPROFILE%\.idlix, menulis konfigurasi build lokal ke local.properties yang diabaikan Git, lalu mengirim nilai IDLIX_SIGNING_BUNDLE langsung ke Actions secrets repo. Nilai secret dan password tidak ditampilkan; password disimpan di local.properties agar laptop bisa membuat APK signed. Jika pengiriman secret gagal, coba lagi dengan opsi -ReuseExisting agar key yang sama dipakai kembali.
-4. Simpan cadangan aman release-signing.jks dan passwordnya. Keduanya dibutuhkan untuk menandatangani rilis berikutnya. Jangan ganti key setelah rilis pertama dipublikasikan.
+GitHub CLI (`gh`) bersifat opsional. Bila tersedia dan sudah login, skrip dapat menyimpan secret langsung; bila tidak, skrip membuka halaman Secrets dan menyalin nilainya agar ditempel sendiri. Nilai secret dan password tidak dimasukkan ke repository.
 
-Skrip meminta konfirmasi CREATE-FRESH karena key baru membuat Android memperlakukan rilis 1.0.0 sebagai instalasi baru. Hapus versi IDLIX lama dari perangkat sebelum memasang rilis baru; data lokal dari aplikasi lama akan terhapus.
+Simpan cadangan file `release-signing.jks` dan password dengan aman di luar repository. Kunci ini harus tetap sama untuk setiap rilis selanjutnya. Jangan mengunggahnya ke repo atau membagikannya di chat.
 
-## Membuat APK
+## Build dan terbitkan
 
-Setelah secret tersedia, penambahan secret tidak otomatis memulai workflow. Jalankan **IDLIX · Android QA / Release** secara manual dari tab Actions pada branch main. Jika berhasil, jalankan **IDLIX · Publish verified APK** untuk membuat rilis v1.0.0.
+- Perubahan kode Android atau konfigurasi build yang dikirim ke `main` memulai build Actions otomatis.
+- Untuk membangun ulang setelah secret baru ditambahkan tanpa perubahan kode, buka **Actions → IDLIX · Android QA / Release → Run workflow**.
+- Setelah build selesai dengan status berhasil dan menghasilkan APK signed, jalankan **Actions → IDLIX · Publish verified APK → Run workflow** untuk menerbitkannya di GitHub Releases.
+- Workflow rilis memakai izin bawaan GitHub Actions. Secret `IDLIX_RELEASE_TOKEN` tidak diperlukan.
 
-Di laptop Windows, konfigurasi lokal yang sama dapat dipakai untuk membuat APK signed dengan:
+Laptop Windows dapat membangun dan menerbitkan rilis dengan `scripts/release-local.ps1` setelah GitHub CLI login. Kunci lokal yang sama dan konfigurasi Android SDK harus tersedia. Jangan menerbitkan build debug sebagai APK rilis.
 
-~~~powershell
-.\scripts\build-local.bat release
-~~~
+## Pemasangan pertama versi 1.0.0
 
-Workflow publikasi memakai token bawaan GitHub Actions dengan izin repo yang sudah didefinisikan di workflow; IDLIX_RELEASE_TOKEN tidak diperlukan.
+Versi 1.0.0 di repository baru memakai kunci rilis baru. Android tidak dapat memasangnya di atas aplikasi lama: hapus IDLIX versi lama lebih dulu. Riwayat dan pengaturan yang tersimpan di instalasi lama tidak ikut terbawa.
