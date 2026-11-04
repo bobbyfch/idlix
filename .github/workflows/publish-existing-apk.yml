@@ -107,7 +107,7 @@ jobs:
             cat > release-notes.md <<'NOTES'
           ## IDLIX 1.0.0 — Ringkasan fitur Seri 1.0
 
-          APK resmi untuk Android phone, tablet, dan Android TV. Dapat dipasang di atas aplikasi IDLIX yang sudah ada untuk mempertahankan data.
+          APK resmi untuk Android phone, tablet, dan Android TV. Karena rilis 1.0.0 memakai kunci signing baru, hapus IDLIX versi lama sebelum memasang rilis ini. Data lokal aplikasi lama tidak ikut terbawa.
 
           ### Tampilan di semua perangkat
           - Layout khusus untuk HP, tablet portrait/landscape, dan Android TV dengan navigasi remote.
