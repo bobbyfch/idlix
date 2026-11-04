@@ -132,7 +132,6 @@ jobs:
           ### Identitas dan pembaruan
           - Ikon adaptif, themed icon, splash screen, dan banner Android TV dengan identitas IDLIX.
           - Pemeriksaan update dari GitHub Releases, validasi ukuran dan SHA-256 APK, lalu pemasangan lewat installer Android.
-          - Preferensi lama dimigrasikan agar pembaruan mempertahankan pengaturan pengguna.
 
           *Informasi katalog, artwork, subtitle, dan kualitas bergantung pada sumber yang tersedia.*
           NOTES
