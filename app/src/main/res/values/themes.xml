@@ -1,0 +1,18 @@
+<resources>
+    <style name="Theme.IdlixTV" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/netflix_black</item>
+        <item name="android:colorBackground">@color/netflix_black</item>
+        <item name="android:colorPrimary">@color/netflix_red</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:navigationBarColor">@color/netflix_black</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+    <!-- AndroidX SplashScreen shows the same IX mark across Android versions.
+         The post-splash theme is the real fullscreen app theme. -->
+    <style name="Theme.IdlixTV.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/idlix_launcher_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/idlix_splash_fg</item>
+        <item name="postSplashScreenTheme">@style/Theme.IdlixTV</item>
+    </style>
+</resources>
