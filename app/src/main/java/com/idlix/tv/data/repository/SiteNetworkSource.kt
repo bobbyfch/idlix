@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -47,20 +46,6 @@ object SiteNetworkSource {
     @Volatile private var cachedNetworks: Pair<Long, List<SiteNetwork>>? = null
     private val itemCache = ConcurrentHashMap<String, Pair<Long, List<SiteNetworkTitle>>>()
 
-    private fun imageOf(anchor: Element): String? {
-        val img = anchor.selectFirst("img") ?: return null
-        val raw = listOf("data-src", "data-lazy-src", "data-original", "src")
-            .firstNotNullOfOrNull { key ->
-                img.attr(key).takeIf { it.isNotBlank() && !it.startsWith("data:") }
-            } ?: return null
-        return when {
-            raw.startsWith("https://") || raw.startsWith("http://") -> raw
-            raw.startsWith("//") -> "https:" + raw
-            raw.startsWith("/") -> ROOT + raw
-            else -> null
-        }
-    }
-
     fun parseNetworks(html: String): List<SiteNetwork> {
         val doc = Jsoup.parse(html, INDEX)
         return doc.select("a[href]").mapNotNull { anchor ->
@@ -83,8 +68,8 @@ object SiteNetworkSource {
         }.distinctBy { it.slug }.take(80)
     }
 
-    fun parseItems(html: String): List<SiteNetworkTitle> {
-        val doc = Jsoup.parse(html, ROOT)
+    fun parseItems(html: String, baseUrl: String = ROOT): List<SiteNetworkTitle> {
+        val doc = Jsoup.parse(html, baseUrl)
         return doc.select("a[href]").mapNotNull { anchor ->
             val href = anchor.absUrl("href").substringBefore('?').trimEnd('/')
             if (!href.startsWith("$ROOT/")) return@mapNotNull null
@@ -107,15 +92,17 @@ object SiteNetworkSource {
                 slug = slug,
                 contentType = contentType,
                 year = year,
-                posterUrl = imageOf(anchor)
+                posterUrl = SiteImageUrl.from(anchor)
             )
         }.distinctBy { it.contentType + ":" + it.slug }.take(200)
     }
 
     private fun fetchPage(url: String): String? {
         val request = Request.Builder().url(url)
-            .header("User-Agent", "Mozilla/5.0 (Android; IDLIX)")
-            .header("Accept", "text/html")
+            .header("User-Agent", "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+            .header("Referer", "$ROOT/")
+            .header("Origin", ROOT)
             .build()
         return client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) null
@@ -150,8 +137,9 @@ object SiteNetworkSource {
             ?.takeIf { now - it.first in 0 until DETAIL_TTL_MS }
             ?.let { return@withContext it.second }
 
+        val pageUrl = "$ROOT/network/$normalized"
         val items = try {
-            fetchPage("$ROOT/network/$normalized")?.let(::parseItems).orEmpty()
+            fetchPage(pageUrl)?.let { parseItems(it, pageUrl) }.orEmpty()
         } catch (cancel: CancellationException) {
             throw cancel
         } catch (_: Exception) {

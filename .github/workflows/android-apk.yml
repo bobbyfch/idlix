@@ -150,29 +150,25 @@ jobs:
       - name: Prepare release notes
         id: notes
         env:
-          GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ steps.version.outputs.name }}
-          RELEASE_VERSION_CODE: ${{ steps.version.outputs.version_code }}
-          RELEASE_SHA: ${{ github.sha }}
           APK_SHA256: ${{ steps.verify.outputs.apk_sha256 }}
         shell: bash
         run: |
           set -euo pipefail
+          if [[ ! -s RELEASE_NOTES.md ]]; then
+            echo "::error::Add a user-friendly Indonesian summary to RELEASE_NOTES.md before releasing."
+            exit 1
+          fi
           TAG="v$RELEASE_VERSION"
           TITLE="IDLIX $RELEASE_VERSION"
-          gh api "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
-            -f tag_name="$TAG" \
-            -f target_commitish="$RELEASE_SHA" \
-            --jq '.body' > release-notes.md
+          cp RELEASE_NOTES.md release-notes.md
           {
             echo
-            echo "### APK"
-            printf -- '- File: `IDLIX-%s.apk`\n' "$RELEASE_VERSION"
-            printf -- '- SHA-256: `%s`\n' "$APK_SHA256"
-            printf '%s\n' '- Package: `com.idlix.tv`'
+            echo "### Unduh APK"
+            printf '%s\n' "- Unduh: [IDLIX-$RELEASE_VERSION.apk](https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/IDLIX-$RELEASE_VERSION.apk)"
+            printf '%s\n' "- SHA-256 APK: $APK_SHA256"
             echo
-            echo "Install this signed APK over your existing IDLIX app to keep local data."
-            echo "<!-- IDLIX_VERSION_CODE=$RELEASE_VERSION_CODE -->"
+            echo "Perbarui aplikasi yang sudah terpasang untuk mempertahankan data dan pengaturan."
           } >> release-notes.md
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "title=$TITLE" >> "$GITHUB_OUTPUT"

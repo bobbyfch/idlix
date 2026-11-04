@@ -11,6 +11,7 @@
 - **Build/release:** every push to `main` and manual run from `main` builds only the signed release APK and publishes a new GitHub Release. No debug APK, separate publisher workflow, or non-main release. `workflow_dispatch` intentionally creates the next patch release.
 - **Signing:** keep the fresh `IDLIX_SIGNING_BUNDLE` only in GitHub Actions secrets and the matching local key outside the repository. Do not commit keystores, passwords, local.properties, or secret bundles. Keep the same signing identity for every later release.
 - **Versions:** use semantic release versions and monotonically increasing version codes. Signed artifact != published Release.
-- **Tests:** the Android build workflow runs JVM tests and assembles debug APK; publishing also requires release signature and package/version verification. Device D-pad, phone touch, live playback, and install-over-old need hands-on QA.
+- **Verification:** the release workflow builds only the signed release APK and verifies its package, version, and signing identity. Device D-pad, phone touch, live playback, and install-over-old still need hands-on QA.
+- **Release notes:** before every push to `main`, update `RELEASE_NOTES.md` with a short Indonesian summary of user-visible changes. Keep it nontechnical; the release workflow adds the APK download and its SHA-256.
 - **Docs:** README is canonical for user-facing current status; `docs/ARCHITECTURE.md` for implementation and `QA_ANDROID_TV.md` for test gates. Do not add historical audit snapshots as current specifications.
 - **Cleanup:** before deleting Android resources, verify references in Kotlin, manifest, XML, tests, and CI.

@@ -6,7 +6,6 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -56,19 +55,6 @@ object SiteCollectionSource {
     private val detailCache = ConcurrentHashMap<String, Pair<Long, List<SiteCollectionItem>>>()
     private const val DETAIL_TTL_MS = 10 * 60_000L
 
-    private fun imageOf(anchor: Element): String? {
-        val img = anchor.selectFirst("img") ?: return null
-        val raw = listOf("data-src", "src").firstNotNullOfOrNull { key ->
-            img.attr(key).takeIf { it.isNotBlank() && !it.startsWith("data:") }
-        } ?: return null
-        return when {
-            raw.startsWith("https://") -> raw
-            raw.startsWith("//") -> "https:" + raw
-            raw.startsWith("/") -> ROOT + raw
-            else -> null
-        }
-    }
-
     fun parseCollections(html: String): List<SiteCollection> {
         val doc = Jsoup.parse(html, INDEX)
         return doc.select("a[href]").mapNotNull { anchor ->
@@ -85,13 +71,13 @@ object SiteCollectionSource {
                 title = title,
                 slug = slug.lowercase(Locale.ROOT),
                 count = countPattern.find(rawText)?.groupValues?.get(1)?.toIntOrNull(),
-                imageUrl = imageOf(anchor)
+                imageUrl = SiteImageUrl.from(anchor)
             )
         }.distinctBy { it.slug }.take(100)
     }
 
-    fun parseItems(html: String): List<SiteCollectionItem> {
-        val doc = Jsoup.parse(html, ROOT)
+    fun parseItems(html: String, baseUrl: String = ROOT): List<SiteCollectionItem> {
+        val doc = Jsoup.parse(html, baseUrl)
         return doc.select("a[href]").mapNotNull { anchor ->
             val href = anchor.absUrl("href")
             if (!href.startsWith(ROOT + "/")) return@mapNotNull null
@@ -110,14 +96,16 @@ object SiteCollectionSource {
                     }
             val year = yearPattern.find(anchor.text())?.groupValues?.get(1)
                 ?: Regex("""-(\d{4})$""").find(slug)?.groupValues?.get(1)
-            SiteCollectionItem(name, slug, type, year, imageOf(anchor))
+            SiteCollectionItem(name, slug, type, year, SiteImageUrl.from(anchor))
         }.distinctBy { it.contentType + ":" + it.slug }.take(200)
     }
 
     private fun fetchPage(url: String): String? {
         val request = Request.Builder().url(url)
-            .header("User-Agent", "Mozilla/5.0 (Android; IDLIX-TV)")
-            .header("Accept", "text/html")
+            .header("User-Agent", "Mozilla/5.0 (Linux; Android) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36")
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8")
+            .header("Referer", "$ROOT/")
+            .header("Origin", ROOT)
             .build()
         return client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) null
@@ -149,8 +137,9 @@ object SiteCollectionSource {
             detailCache[normalized]?.takeIf { now - it.first in 0 until DETAIL_TTL_MS }
                 ?.let { return@withContext it.second }
 
+            val pageUrl = ROOT + "/collection/" + normalized
             val items = try {
-                fetchPage(ROOT + "/collection/" + normalized)?.let(::parseItems).orEmpty()
+                fetchPage(pageUrl)?.let { parseItems(it, pageUrl) }.orEmpty()
             } catch (cancel: CancellationException) {
                 throw cancel
             } catch (_: Exception) {
