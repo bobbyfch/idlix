@@ -138,7 +138,7 @@ fun TvContinueWatchingCard(
             ) {
                 Text(
                     text = item.title,
-                    color = NetflixWhite,
+                    color = Color.White,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
