@@ -1,25 +1,21 @@
-# Signing dan rilis IDLIX
+# Build dan rilis IDLIX otomatis
 
-## Siapkan satu kali
+## Kunci rilis
 
-1. Di laptop Windows, pasang JDK 21 dan unduh ZIP dari [repo IDLIX](https://github.com/bobbyfch/idlix).
-2. Ekstrak ZIP, lalu jalankan `RUN-IDLIX-SIGNING.bat`.
-3. Ketik `CREATE-FRESH` saat diminta. Skrip membuat kunci rilis di `%USERPROFILE%\.idlix` dan menyiapkan konfigurasi lokal dalam `local.properties`.
-4. Saat halaman GitHub terbuka, tambahkan secret bernama `IDLIX_SIGNING_BUNDLE`, tempel nilai yang sudah disalin skrip, lalu simpan. Kembali ke jendela skrip dan ketik `SECRET-SAVED`.
+Repository menggunakan GitHub Actions secret `IDLIX_SIGNING_BUNDLE` untuk menandatangani semua APK rilis. Kunci lokal yang cocok berada di luar repository. Jangan mengganti atau mengunggah kunci itu; tanpa kunci yang sama, Android tidak dapat memasang pembaruan di atas aplikasi yang sudah ada.
 
-GitHub CLI (`gh`) bersifat opsional. Bila tersedia dan sudah login, skrip dapat menyimpan secret langsung; bila tidak, skrip membuka halaman Secrets dan menyalin nilainya agar ditempel sendiri. Nilai secret dan password tidak dimasukkan ke repository.
+## Dari HP tanpa komputer
 
-Simpan cadangan file `release-signing.jks` dan password dengan aman di luar repository. Kunci ini harus tetap sama untuk setiap rilis selanjutnya. Jangan mengunggahnya ke repo atau membagikannya di chat.
+Setelah kunci rilis disiapkan satu kali, minta ChatGPT mengubah repository `bobbyfch/idlix` langsung pada branch `main`. Setiap commit ke `main` otomatis memulai build APK release signed dan menerbitkannya ke GitHub Releases setelah verifikasi berhasil.
 
-## Build dan terbitkan
+Tidak ada build APK debug dan tidak ada workflow publikasi kedua. Untuk memulai rilis secara manual, gunakan **Actions → IDLIX · Release APK → Run workflow** dengan branch `main`. Menjalankan secara manual memang membuat rilis patch berikutnya.
 
-- Perubahan kode Android atau konfigurasi build yang dikirim ke `main` memulai build Actions otomatis.
-- Untuk membangun ulang setelah secret baru ditambahkan tanpa perubahan kode, buka **Actions → IDLIX · Android QA / Release → Run workflow**.
-- Setelah build selesai dengan status berhasil dan menghasilkan APK signed, jalankan **Actions → IDLIX · Publish verified APK → Run workflow** untuk menerbitkannya di GitHub Releases.
-- Workflow rilis memakai izin bawaan GitHub Actions. Secret `IDLIX_RELEASE_TOKEN` tidak diperlukan.
+## Mengunduh dan memperbarui
 
-Laptop Windows dapat membangun dan menerbitkan rilis dengan `scripts/release-local.ps1` setelah GitHub CLI login. Kunci lokal yang sama dan konfigurasi Android SDK harus tersedia. Jangan menerbitkan build debug sebagai APK rilis.
+Ambil APK terbaru dari [GitHub Releases](https://github.com/bobbyfch/idlix/releases/latest). Rilis setelah 1.0.0 memakai kunci yang sama, sehingga dapat dipasang sebagai pembaruan biasa. Android tetap meminta persetujuan sebelum pemasangan.
 
-## Pemasangan pertama versi 1.0.0
+Rilis 1.0.0 di repository baru memakai kunci yang berbeda dari aplikasi lama. Untuk pemasangan pertama, hapus IDLIX versi lama terlebih dahulu; data lokal dari instalasi lama tidak ikut terbawa.
 
-Versi 1.0.0 di repository baru memakai kunci rilis baru. Android tidak dapat memasangnya di atas aplikasi lama: hapus IDLIX versi lama lebih dulu. Riwayat dan pengaturan yang tersimpan di instalasi lama tidak ikut terbawa.
+## Build lokal
+
+Di laptop Windows, konfigurasi JDK 21, Android SDK, GitHub CLI, dan kunci lokal yang sama diperlukan untuk memakai `scripts/release-local.ps1`. Jangan mengunggah APK debug sebagai rilis.

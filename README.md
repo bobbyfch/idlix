@@ -21,6 +21,8 @@ IDLIX menyatukan katalog film dan serial dalam satu aplikasi. Tampilan menyesuai
 
 **[Unduh APK terbaru](https://github.com/bobbyfch/idlix/releases/latest)** · [Lihat riwayat build](https://github.com/bobbyfch/idlix/actions/workflows/android-apk.yml) · [Panduan instalasi TV](PANDUAN_INSTALASI_TV.md)
 
+Setiap perubahan yang masuk ke `main` otomatis dibangun dan diterbitkan sebagai rilis APK baru.
+
 ## Fitur
 
 - Beranda, Film, Serial, Jelajah, Pencarian, Riwayat, dan Pengaturan.
