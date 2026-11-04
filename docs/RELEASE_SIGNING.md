@@ -2,13 +2,9 @@
 
 Rilis pertama di repo baru memakai signing key baru. Siapkan secret ini sekali dari laptop Windows sebelum meminta APK release:
 
-1. Pasang JDK 21 dan GitHub CLI (gh), lalu login ke akun yang punya akses admin ke bobbyfch/idlix dengan perintah gh auth login.
-2. Di folder hasil clone repo, buka PowerShell dan jalankan:
-
-   ~~~powershell
-   Set-ExecutionPolicy -Scope Process Bypass
-   .\scripts\create-signing-secret.ps1
-   ~~~
+1. Unduh ZIP repo bobbyfch/idlix dan ekstrak ke laptop Windows.
+2. Pasang JDK 21 dan GitHub CLI (gh), lalu login ke akun yang punya akses admin ke repo dengan gh auth login.
+3. Dari folder hasil ekstrak, klik dua kali RUN-IDLIX-SIGNING.bat dan ketik CREATE-FRESH saat diminta.
 
 3. Skrip membuat key di folder %USERPROFILE%\.idlix, menulis konfigurasi build lokal ke local.properties yang diabaikan Git, lalu mengirim nilai IDLIX_SIGNING_BUNDLE langsung ke Actions secrets repo. Nilai secret dan password tidak ditampilkan; password disimpan di local.properties agar laptop bisa membuat APK signed. Jika pengiriman secret gagal, coba lagi dengan opsi -ReuseExisting agar key yang sama dipakai kembali.
 4. Simpan cadangan aman release-signing.jks dan passwordnya. Keduanya dibutuhkan untuk menandatangani rilis berikutnya. Jangan ganti key setelah rilis pertama dipublikasikan.
