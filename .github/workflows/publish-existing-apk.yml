@@ -67,7 +67,7 @@ jobs:
           APK_PATH="$(find artifact -type f -name app-release.apk -print -quit)"
           INFO_PATH="$(find artifact -type f -name release-info.env -print -quit)"
           if [[ -z "${APK_PATH}" || -z "${INFO_PATH}" ]]; then
-            echo "::error::No signed APK metadata was found. Add the existing IDLIX_SIGNING_BUNDLE secret to this repository, then run a new Android build."
+            echo "::error::No signed APK metadata was found. Create IDLIX_SIGNING_BUNDLE with scripts/create-signing-secret.ps1, then run a new Android build."
             exit 1
           fi
           VERSION="$(sed -n 's/^IDLIX_RELEASE_VERSION=//p' "${INFO_PATH}" | head -n1)"
