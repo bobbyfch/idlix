@@ -304,7 +304,7 @@ class IdlixRepository(
             val (movies, shows) = kotlinx.coroutines.coroutineScope {
                 val movieJob = async {
                     if (moviesEnd) null else try {
-                        val key = "${genre.orEmpty()}:$page"
+                        val key = "${ApiClient.getBaseUrl()}|${genre.orEmpty()}:$page"
                         val cached = catalogMoviePages[key]
                         if (cached != null && System.currentTimeMillis() - cached.first < 5 * 60_000L) {
                             cached.second
@@ -320,7 +320,7 @@ class IdlixRepository(
                 }
                 val seriesJob = async {
                     if (seriesEnd) null else try {
-                        val key = "${genre.orEmpty()}:$page"
+                        val key = "${ApiClient.getBaseUrl()}|${genre.orEmpty()}:$page"
                         val cached = catalogSeriesPages[key]
                         if (cached != null && System.currentTimeMillis() - cached.first < 5 * 60_000L) {
                             cached.second

@@ -63,8 +63,6 @@ import com.idlix.tv.ui.navigation.Screen
 import com.idlix.tv.ui.theme.NetflixRed
 import com.idlix.tv.ui.theme.NetflixBlack
 import com.idlix.tv.data.local.AppColorMode
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 private data class MobileTab(val route: String, val label: String, val icon: ImageVector)
 
@@ -190,9 +188,7 @@ fun MobileNavigation(tabletMode: Boolean = false) {
                 arguments = listOf(navArgument("name") { type = NavType.StringType })
             ) { backStack ->
                 val rawName = backStack.arguments?.getString("name").orEmpty()
-                val actorName = runCatching {
-                    URLDecoder.decode(rawName, StandardCharsets.UTF_8.toString())
-                }.getOrDefault(rawName)
+                val actorName = rawName
                 MobileSearchScreen(onDetail = openDetails, onCollection = { slug -> navController.navigate(Screen.Browse.createRoute("collections", slug)) }, initialQuery = actorName)
             }
             composable(Screen.ContinueWatching.route) {
@@ -231,19 +227,17 @@ fun MobileNavigation(tabletMode: Boolean = false) {
                     navArgument("episode") { type = NavType.StringType; nullable = true; defaultValue = "" }
                 )
             ) { backStack ->
-                fun decoded(name: String): String = backStack.arguments?.getString(name)
-                    ?.let { raw -> runCatching { URLDecoder.decode(raw, StandardCharsets.UTF_8.toString()) }.getOrDefault(raw) }
-                    .orEmpty()
+                fun argument(name: String): String = backStack.arguments?.getString(name).orEmpty()
 
                 MobilePlayerScreen(
-                    contentType = decoded("contentType"),
-                    contentId = decoded("contentId"),
-                    title = decoded("title"),
-                    posterUrl = decoded("poster").ifBlank { null },
-                    backdropUrl = decoded("backdrop").ifBlank { null },
-                    slug = decoded("slug").ifBlank { null },
-                    seasonNumber = decoded("season").toIntOrNull(),
-                    episodeNumber = decoded("episode").toIntOrNull(),
+                    contentType = argument("contentType"),
+                    contentId = argument("contentId"),
+                    title = argument("title"),
+                    posterUrl = argument("poster").ifBlank { null },
+                    backdropUrl = argument("backdrop").ifBlank { null },
+                    slug = argument("slug").ifBlank { null },
+                    seasonNumber = argument("season").toIntOrNull(),
+                    episodeNumber = argument("episode").toIntOrNull(),
                     onBack = { navController.popBackStack() },
                     tabletMode = tabletMode
                 )

@@ -1,4 +1,4 @@
 ## Yang baru
 
-- Sampul Network Originals kini punya sumber cadangan agar daftar tayangan tidak berhenti sebagai kotak kosong.
-- Logo Netflix, Disney+, HBO, Prime Video, Apple TV+, dan platform lain kini terlihat saat memilih Network di ponsel maupun Android TV.
+- Judul, nama pemeran, dan gambar tetap terbaca dengan benar saat memakai tanda khusus.
+- Daftar katalog tidak mencampur hasil dari alamat sumber yang berbeda.
