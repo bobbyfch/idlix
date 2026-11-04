@@ -167,9 +167,9 @@ jobs:
           {
             echo
             echo "### APK"
-            echo "- File: `IDLIX-$RELEASE_VERSION.apk`"
-            echo "- SHA-256: `$APK_SHA256`"
-            echo "- Package: `com.idlix.tv`"
+            printf -- '- File: `IDLIX-%s.apk`\n' "$RELEASE_VERSION"
+            printf -- '- SHA-256: `%s`\n' "$APK_SHA256"
+            printf '%s\n' '- Package: `com.idlix.tv`'
             echo
             echo "Install this signed APK over your existing IDLIX app to keep local data."
             echo "<!-- IDLIX_VERSION_CODE=$RELEASE_VERSION_CODE -->"
